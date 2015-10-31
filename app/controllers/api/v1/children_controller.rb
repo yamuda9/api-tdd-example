@@ -34,6 +34,21 @@ class API::V1::ChildrenController < ApplicationController
     end
   end
 
+  def update
+    @children = Children.find_by(id: params[:id])
+
+    if @children.update(children_params)
+      render json: { success: true,
+                     first_name: @children.first_name,
+                     last_name: @children.last_name,
+                     age: @children.age,
+                     date_of_birth: @children.date_of_birth
+      }, status: :ok
+    else
+      render json: { success: false }, status: :unprocessable_entity
+    end
+  end
+
   private
 
   def children_params
