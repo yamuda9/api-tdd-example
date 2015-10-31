@@ -69,7 +69,7 @@ RSpec.describe API::V1::ChildrenController, type: :controller do
     end
   end
 
-  context "PATCH post/id" do
+  context "PATCH children/id" do
     it "valid attributes" do
       children = Children.create!(first_name: "Joe", last_name: "Smith", age: 18, date_of_birth: DateTime.new(1997))
       updated_children = Children.create!(first_name: "Jack", last_name: "Jill", age: 19, date_of_birth: DateTime.new(1996))
@@ -91,6 +91,32 @@ RSpec.describe API::V1::ChildrenController, type: :controller do
       children = Children.create!(first_name: "Joe", last_name: "Smith", age: 18, date_of_birth: DateTime.new(1997))
 
       patch :update, id: children, children: { first_name: nil, last_name: "Jill", age: 19, date_of_birth: DateTime.new(1996) }
+
+      expect(response.status).to eq(422)
+      expect(response.content_type).to eq('application/json')
+
+      response_message = JSON.parse(response.body)
+      expect(response_message["success"]).to eq(false)
+    end
+  end
+
+  context "DELETE children/id" do
+    it "valid attributes" do
+      children = Children.create!(first_name: "Joe", last_name: "Smith", age: 18, date_of_birth: DateTime.new(1997))
+
+      expect{ delete :destroy, id: children }.to change{Children.count}.by(-1)
+
+      expect(response.status).to eq(204)
+      expect(response.content_type).to eq('application/json')
+
+      response_message = JSON.parse(response.body)
+      expect(response_message["success"]).to eq(true)
+    end
+
+    it "invalid attributes" do
+      children = Children.create!(first_name: "Joe", last_name: "Smith", age: 18, date_of_birth: DateTime.new(1997))
+
+      expect{ delete :destroy, id: 99 }.to change{Children.count}.by(0)
 
       expect(response.status).to eq(422)
       expect(response.content_type).to eq('application/json')

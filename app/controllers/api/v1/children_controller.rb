@@ -49,6 +49,17 @@ class API::V1::ChildrenController < ApplicationController
     end
   end
 
+  def destroy
+    @children = Children.find_by(id: params[:id])
+
+    if @children
+      @children.destroy
+      render json: { success: true }, status: :no_content
+    else
+      render json: { success: false }, status: :unprocessable_entity
+    end
+  end
+
   private
 
   def children_params
