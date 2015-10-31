@@ -41,4 +41,31 @@ RSpec.describe API::V1::ChildrenController, type: :controller do
       expect(response_message["success"]).to eq(false)
     end
   end
+
+  context "POST children" do
+    it "valid attributes" do
+      children = Children.create!(first_name: "Joe", last_name: "Smith", age: 18, date_of_birth: DateTime.new(1997))
+      expect{ post :create, children: { first_name: "Joe", last_name: "Smith", age: 18, date_of_birth: DateTime.new(1997) } }.to change{Children.count}.by(1)
+
+      expect(response.status).to eq(201)
+      expect(response.content_type).to eq('application/json')
+
+      response_message = JSON.parse(response.body)
+      expect(response_message["success"]).to eq(true)
+      expect(children.first_name).to eq(response_message["first_name"])
+      expect(children.last_name).to eq(response_message["last_name"])
+      expect(children.age).to eq(response_message["age"])
+      expect(children.date_of_birth).to eq(response_message["date_of_birth"])
+    end
+
+    it "invalid attributes" do
+      expect{ post :create, children: { first_name: nil, last_name: "Smith", age: 18, date_of_birth: DateTime.new(1997) } }.to change{Children.count}.by(0)
+
+      expect(response.status).to eq(422)
+      expect(response.content_type).to eq('application/json')
+
+      response_message = JSON.parse(response.body)
+      expect(response_message["success"]).to eq(false)
+    end
+  end
 end

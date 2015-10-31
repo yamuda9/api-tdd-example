@@ -18,4 +18,25 @@ class API::V1::ChildrenController < ApplicationController
       render json: { success: false }, status: :unprocessable_entity
     end
   end
+
+  def create
+    @children = Children.new(children_params)
+
+    if @children.save
+      render json: { success: true,
+                     first_name: @children.first_name,
+                     last_name: @children.last_name,
+                     age: @children.age,
+                     date_of_birth: @children.date_of_birth
+      }, status: :created
+    else
+      render json: { success: false }, status: :unprocessable_entity
+    end
+  end
+
+  private
+
+  def children_params
+    params.require(:children).permit(:first_name, :last_name, :age, :date_of_birth)
+  end
 end
